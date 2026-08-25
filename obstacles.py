@@ -34,4 +34,15 @@ class Tire(Item):
 
 
 
+class Nitro(Item):
+    def __init__(self, lane, speed, top_pos, bottom_pos):
+        super().__init__(lane, speed, top_pos, bottom_pos)
+
+    # If collided, increase points and disappear
+    def collided(self, points):
+        ...
+        return points
+
+
+
 
