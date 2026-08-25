@@ -10,7 +10,19 @@ lanes = 4
 
 
 # Populate: Returns a list of random items in random lanes
-...
+def populate(number, lanes):
+    items = []
+    for _ in range(number):
+        type = rand.randint(1,2)
+        lane = rand.randint(1, lanes)
+
+        if type == 1:
+            items.append(it.Tire(lane, speed, top_pos, bottom_pos))
+
+        else:
+            items.append(it.Nitro(lane, speed, top_pos, bottom_pos))
+        cv.waitKey(rand.randint(100, 2000))
+    return items
 # Replace inactive items
 ...
 # Check Position for any object (returns lane and pos)
