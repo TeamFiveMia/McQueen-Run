@@ -1,6 +1,6 @@
 import random as rand
 import obstacles as ob
-
+import useNitro
 speed = 5 # The speed at which items move
 top_pos = 200 # Position at the top of the screen
 bottom_pos = 0 # Position at the bottom of the screen
@@ -44,12 +44,18 @@ def main():
     while 1:
         if points < 0:
             game_lost()
-        for item in items:
-            item.step()
-            if item.active == False:
-                item = new_item(number, lanes)
-            if item.collided(item, mcqueen.lane, mcqueen.pos, mcqueen.vulnerable):
-                item.collision_action(points, penalty=penalty, reward=reward)
+        string,isNitro = useNitro.response()
+        if not isNitro:
+
+            for item in items:
+                item.step()
+                if item.active == False:
+                    item = new_item(number, lanes)
+                if item.collided(item, mcqueen.lane, mcqueen.pos, mcqueen.vulnerable):
+                    item.collision_action(points, penalty=penalty, reward=reward)
+            if detection == "peace_sign":
+                useNitro.after_detection()
+        
 
 
 if __name__ == "__main__":

@@ -13,7 +13,12 @@ def after_detection():
         nitro -=1
         valnerable = False
         boost = True
-        currentTime = time.time() + boost_time
+        endTime = time.time() + boost_time
 def response():
     global valnerable,boost
+    if boost and time.time()>= endTime:
+        boost = False
+        valnerable = True
+        return "Nitro Done",True
+    return "Nitro not Done",False
         
