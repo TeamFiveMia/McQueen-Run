@@ -1,7 +1,7 @@
 # Path configuration (Relative to where you run the script, or absolute paths)
 path: .  # Root dataset directory
 train: data/train             # Path to training images (relative to 'path')
-val: data/val                 # Path to validation images (relative to 'path')
+val: data/validation                 # Path to validation images (relative to 'path')
 
 # Number of classes
 nc: 2

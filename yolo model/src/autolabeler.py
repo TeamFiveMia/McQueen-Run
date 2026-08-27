@@ -23,10 +23,10 @@ options = vision.HandLandmarkerOptions(
     min_hand_detection_confidence=0.7
 )
 
-input_dir = "data\\data\\train"
-output = "data\\labels"
-os.makedirs(output, exist_ok=True)
-test_pic = "extracted_frames\\frame_00001.jpg"
+input_dir = "data\\train"
+
+# os.makedirs(output, exist_ok=True)
+#test_pic = "extracted_frames\\frame_00001.jpg"
 
 
 
@@ -51,69 +51,92 @@ test_pic = "extracted_frames\\frame_00001.jpg"
 
 
 
-
+failed_pics = []
 
 with vision.HandLandmarker.create_from_options(options) as finder:
-    img = cv.imread(test_pic)
-    img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+    for filename in os.listdir(input_dir):
+        if not filename.lower().endswith((".jpg", ".jpeg", ".png")):
+            continue
 
-    mp_img = mp.Image(mp.ImageFormat.SRGB, img)
-
-
-    result = finder.detect(mp_img)
-    print("hi2")
-    if result.hand_landmarks:
-        print("hi")
-        for lm in result.hand_landmarks:
-            print(lm)
-            thumb_up = False
-            index_up = False
-            middle_up = False
-            ring_up = False
-            pinky_up = False
-
-            # if lm[4].y > lm[2]:
-            #     thumb_up = True
-
-            if lm[8].y < lm[6].y:
-                index_up = True
-
-            if lm[12].y < lm[10].y:
-                middle_up = True
-
-            if lm[16].y < lm[14].y:
-                ring_up = True
-
-            if lm[20].y < lm[18].y:
-                pinky_up = True
-
-            if index_up and middle_up and ring_up and pinky_up:
-                hand = "Palm"
-            elif index_up and middle_up and not ring_up and not pinky_up:
-                hand = "Peace Sign"
-            else:
-                hand = None
+        img_path = os.path.join(input_dir, filename)
+        img = cv.imread(img_path)
+        img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+        mp_img = mp.Image(mp.ImageFormat.SRGB, img)
 
 
-            if hand:
-                hand = CLASS_MAP[hand]
-                x_coords = [landmark.x for landmark in lm]
-                y_coords = [landmark.y for landmark in lm]
+        result = finder.detect(mp_img)
+        
+        if result.hand_landmarks:
+        
+            for lm in result.hand_landmarks:
+                
+                thumb_up = False
+                index_up = False
+                middle_up = False
+                ring_up = False
+                pinky_up = False
 
-                x_min = min(x_coords)
-                x_max = max(x_coords)
-                y_min = min(y_coords)
-                y_max = max(y_coords)
+                # if lm[4].y > lm[2]:
+                #     thumb_up = True
 
-                #for YOLO format
-                #class_id center_x center_y width height
-                box_w = x_max - x_min
-                box_h = y_max - y_min
-                x_center = x_min + (box_w / 2)
-                y_center = y_min + (box_h / 2)
+                if lm[8].y < lm[6].y:
+                    index_up = True
 
-                txt_path = "extracted_frames\\frame_00001.txt"
-                with open(txt_path, "w") as f:
-                    f.write(f"{hand} {x_center:.6f} {y_center:.6f} {box_w:.6f} {box_h:.6f}\n")
+                if lm[12].y < lm[10].y:
+                    middle_up = True
 
-                print("Done labeling")
+                if lm[16].y < lm[14].y:
+                    ring_up = True
+
+                if lm[20].y < lm[18].y:
+                    pinky_up = True
+
+                if index_up and middle_up and ring_up and pinky_up:
+                    hand = "Palm"
+                elif index_up and middle_up and not ring_up and not pinky_up:
+                    hand = "Peace Sign"
+                else:
+                    hand = None
+
+
+                if hand:
+                    hand = CLASS_MAP[hand]
+                    x_coords = [landmark.x for landmark in lm]
+                    y_coords = [landmark.y for landmark in lm]
+
+                    x_min = min(x_coords)
+                    x_max = max(x_coords)
+                    y_min = min(y_coords)
+                    y_max = max(y_coords)
+
+                    #for YOLO format
+                    #class_id center_x center_y width height
+                    padding = 0.30  # 30% padding
+
+                    x_min = max(0, x_min - padding * (x_max - x_min))
+                    x_max = min(1, x_max + padding * (x_max - x_min))
+                    y_min = max(0, y_min - padding * (y_max - y_min))
+                    y_max = min(1, y_max + padding * (y_max - y_min))
+                    box_w = x_max - x_min
+                    box_h = y_max - y_min
+                    x_center = x_min + (box_w / 2)
+                    y_center = y_min + (box_h / 2)
+
+                    txt_path = os.path.join(
+                                            input,
+                                            os.path.splitext(filename)[0] + ".txt"
+                    )
+                    with open(txt_path, "w") as f:
+                        f.write(f"{hand} {x_center:.6f} {y_center:.6f} {box_w:.6f} {box_h:.6f}\n")
+
+                    print("Done labeling")
+                else:
+                    failed_pics.append(filename)
+
+        else:
+            failed_pics.append(filename)
+
+print(failed_pics)
+with open("failed_pics.txt", "w") as f:
+    for pic in failed_pics:
+        f.write(f"{pic}\n")
