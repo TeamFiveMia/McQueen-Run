@@ -15,7 +15,7 @@ FRAME_WIDTH = int(camera.get(cv.CAP_PROP_FRAME_WIDTH))
 FRAME_HEIGHT = int(camera.get(cv.CAP_PROP_FRAME_HEIGHT))
 
 # Load the YOLO model
-model = YOLO("")    # TODO (Model type)
+model = YOLO("yolo11n.pt")    # TODO (Model type)
 
 speed = 5 # The speed at which items move
 top_pos = FRAME_HEIGHT # Position at the top of the screen
@@ -24,22 +24,22 @@ bottom_pos = 0 # Position at the bottom of the screen
 NUM_ITEMS = 10 # Number of items at any time
 NUM_LANES = 5 # Number of lanes ( MODIFIED )
 items = [] # The list of all items
-LANE_WIDTH = FRAME_WIDTH / lanes
+LANE_WIDTH = FRAME_WIDTH / NUM_LANES
 
 points = 0 # Initializing points to 0
 PENALTY = 10 # The penalty of points when colliding with the tires
 REWARD = 5 # The reward points when collecting with nitro
 
-# Get McQueen's data, from Rewan's code
-McQueen.pos = ...       
-McQueen.lane = lanes // 2      # (MODIFIABLE) start at the Middle
-McQueen.vulnerable = ...
+# Get mcqueen's data, from Rewan's code
+# mcqueen.pos = ...       
+# mcqueen.lane = NUM_LANES // 2      # (MODIFIABLE) start at the Middle
+# mcqueen.vulnerable = ...
 
 # new_item: Returns a list of random items in random lanes
-def new_item(number, lanes):
+def new_item(number, no_lanes):
     for _ in range(number):
         type = rand.randint(1,2)
-        lane = rand.randint(0, lanes)
+        lane = rand.randint(0, no_lanes)
 
         if type == 1:
             return ob.Tire(lane, speed, top_pos, bottom_pos)
@@ -56,11 +56,10 @@ def game_lost():
 
 
 def main():
-
-    mcqueen = McQueen(NUM_LANES, FRAME_WIDTH, FRAME_HEIGHT)
+    mcqueen = McQueen.McQueen(NUM_LANES, FRAME_WIDTH, FRAME_HEIGHT)
     # Create the items
     for _ in range(10):
-        items.append(new_item(NUM_ITEMS, lanes))
+        items.append(new_item(NUM_ITEMS, NUM_LANES))
 
     # Start the game
     while True:
@@ -78,20 +77,18 @@ def main():
             game_lost()
 
         # Check for the palm gesture with highest confidence
-        palm = Steer.get_palm(detection)
+        palm = Steer.get_palm(detection[0])
 
         # If Palm was detected
         if palm is not None:
             # Get the coordinates of the Bounding box
             x1, y1, x2, y2 = palm
             # Calculate the center of the box
-            x_center = (x1 + x2) / 2
+            x_center = float( float(x1) + float(x2) ) / 2
             # Get the current lane
-            mcqueen.update_lane(x_center, LANE_WIDTH, lanes)
+            mcqueen.update_lane(x_center)
             
             
-        # Calculate the current X position
-        McQueen.pos = Steer.calc_position(McQueen.lane, LANE_WIDTH)
 
         # Check if Nitro is Working   
         string, isNitro = useNitro.response()
@@ -101,23 +98,21 @@ def main():
             for item in items:
                 item.step()
                 if item.active == False:
-                    item = new_item(NUM_ITEMS, lanes)
-                if item.collided(item, McQueen.lane, McQueen.pos, McQueen.vulnerable):
+                    item = new_item(NUM_ITEMS, NUM_LANES)
+                if item.collided(mcqueen.current_lane, mcqueen.y, mcqueen.is_boosting):
                     item.collision_action(points, penalty=PENALTY, reward=REWARD)
             if detection == "peace_sign":
                 useNitro.after_detection()
 
 
-        
-
         # Show the frame
         frame = lanes.draw_track(frame, NUM_LANES)
-        frame = McQueen.draw(frame)
+        frame = mcqueen.draw(frame)
         
-        cv.putText(frame, f"Lane: {McQueen.current_lane}", (10, 30),
+        cv.putText(frame, f"Lane: {mcqueen.current_lane}", (10, 30),
             cv.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
         
-        cv.imshow("McQueen Run", frame)
+        cv.imshow("mcqueen Run", frame)
         key = cv.waitKey(1) & 0xFF
         if key == ord('q'):
             break

@@ -39,7 +39,6 @@ class McQueen:
         self.smooth_speed = 0.35  
 
         self.is_boosting = False   # turned on/off by the nitro/boost module
-
     def update_lane(self, hand_x_pixels: float):
         """Update which lane McQueen should be in, based on the hand's x-position."""
         self.current_lane = get_lane_index(hand_x_pixels, self.frame_width, self.num_lanes)
@@ -52,7 +51,7 @@ class McQueen:
         """Turn off boost visuals (call this when the boost window ends)."""
         self.is_boosting = False
 
-    def _update_smoothing(self):
+    def _update_smoothing(self):        # Already used in draw method
         """Move display_x a little closer to the target lane's center each frame."""
         target_x = get_lane_center_x(self.current_lane, self.frame_width, self.num_lanes)
         if self.smooth:
@@ -64,7 +63,7 @@ class McQueen:
         """Return McQueen's current x-position on screen (after smoothing)."""
         return int(self.display_x)
 
-    def draw(self, frame: np.ndarray) -> np.ndarray:
+    def draw(self, frame: np.ndarray) -> np.ndarray:            # Implemented
         """Update smooth position and draw McQueen's car icon on the frame."""
         self._update_smoothing()
         x_center = self.get_x_center()

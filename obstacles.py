@@ -4,14 +4,12 @@ import useNitro
 
 # Define a class "Item" which is any item that appears in the game
 class Item:
-    def __init__(self, lane, speed, top_pos, bottom_pos, frame_width):
+    def __init__(self, lane, speed, top_pos, bottom_pos):
         self.speed = speed
         self.lane = lane
         self.position = top_pos + rand.randint(1, 100)
         self.bottom_pos = bottom_pos
         self.active = True
-        self.lane_width = frame_width
-        self.x = get_lane_center_x(self.lane, self.lane_width)
 
     def step(self): # Steps the item
         # If the item hits the bottom, destroy it, else move it down.
