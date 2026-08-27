@@ -5,8 +5,9 @@ LANE_LINE_COLOR =(255, 255, 255)
 LANE_LINE_THICKNESS = 2
 
 
-def get_lane_boundaries(lane_width, num_lanes):    
+def get_lane_boundaries(frame_width, num_lanes):    
     lanes = []
+    lane_width = frame_width / num_lanes
     for i in range(num_lanes):
         x_start = int(i * lane_width)
         x_end = int((i + 1) * lane_width)

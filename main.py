@@ -1,122 +1,123 @@
 import random as rand
+import cv2 as cv
+from ultralytics import YOLO
 import McQueen
 import lanes
 import obstacles as ob
-import numpy as np      # Importing numpy
-import cv2 as cv        # Import open cv library
-import useNitro         # Import Module that contains Nitro boost feature
-import Steer         # Import Module that contains palm steering feature
-from ultralytics import YOLO # Import the YOLO models (YOU ONLY LOOK ONCE)
+import useNitro
+import Steer
 
-# Start the Web Cam
+# Start the Video Capture
 camera = cv.VideoCapture(0)
-# Get the actual DIMENSIONS of the camera
+# Get the dimensions of the web came
 FRAME_WIDTH = int(camera.get(cv.CAP_PROP_FRAME_WIDTH))
 FRAME_HEIGHT = int(camera.get(cv.CAP_PROP_FRAME_HEIGHT))
 
-# Load the YOLO model
-model = YOLO("yolo11n.pt")    # TODO (Model type)
+# Load the model
+model = YOLO("best.pt")
 
-speed = 5 # The speed at which items move
-top_pos = FRAME_HEIGHT # Position at the top of the screen
-bottom_pos = 0 # Position at the bottom of the screen
+SPEED = 5      # Speed of objects falling
+TOP_POS = 0    # Coordinates start y = 0 from up
+BOTTOM_POS = FRAME_HEIGHT
 
-NUM_ITEMS = 10 # Number of items at any time
-NUM_LANES = 5 # Number of lanes ( MODIFIED )
-items = [] # The list of all items
-LANE_WIDTH = FRAME_WIDTH / NUM_LANES
+NUM_ITEMS = 10   # Number of obstacles
+NUM_LANES = 5    # Number of lanes (fixed :( )
 
-points = 0 # Initializing points to 0
-PENALTY = 10 # The penalty of points when colliding with the tires
-REWARD = 5 # The reward points when collecting with nitro
+PENALTY = 10
+REWARD = 5
 
-# Get mcqueen's data, from Rewan's code
-# mcqueen.pos = ...       
-# mcqueen.lane = NUM_LANES // 2      # (MODIFIABLE) start at the Middle
-# mcqueen.vulnerable = ...
+points = 0     # Score
 
-# new_item: Returns a list of random items in random lanes
-def new_item(number, no_lanes):
-    for _ in range(number):
-        type = rand.randint(1,2)
-        lane = rand.randint(0, no_lanes)
 
-        if type == 1:
-            return ob.Tire(lane, speed, top_pos, bottom_pos)
+def new_item(no_lanes):
+    """Create a single random item (Tire or Nitro) in a random lane."""
+    lane = rand.randint(0, no_lanes - 1)
+    if rand.randint(1, 2) == 1:
+        return ob.Tire(lane, SPEED, TOP_POS, BOTTOM_POS, FRAME_WIDTH, NUM_LANES)
+    else:
+        return ob.Nitro(lane, SPEED, TOP_POS, BOTTOM_POS, FRAME_WIDTH, NUM_LANES)
 
-        else:
-            return ob.Nitro(lane, speed, top_pos, bottom_pos)
 
-# Handle losing the game
-def game_lost():
-    ...
-    # Closing the windows
+def game_lost(frame):
+    # Output Game Over at the center of the screen
+    cv.putText(frame, "GAME OVER", (FRAME_WIDTH // 2 - 150, FRAME_HEIGHT // 2 - 20),
+               cv.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 255), 3)
+    cv.putText(frame, f"Final Score: {points}", (FRAME_WIDTH // 2 - 150, FRAME_HEIGHT // 2 + 30),
+               cv.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+    cv.imshow("mcqueen Run", frame)
+    cv.waitKey(2000)
     camera.release()
     cv.destroyAllWindows()
 
 
 def main():
-    mcqueen = McQueen.McQueen(NUM_LANES, FRAME_WIDTH, FRAME_HEIGHT)
-    # Create the items
-    for _ in range(10):
-        items.append(new_item(NUM_ITEMS, NUM_LANES))
+    global points
 
-    # Start the game
+    mcqueen = McQueen.McQueen(NUM_LANES, FRAME_WIDTH, FRAME_HEIGHT)
+    items = []
+    for _ in range(NUM_ITEMS):
+        items.append(new_item(NUM_LANES))
+
     while True:
-        # Read the Camera frame
         loaded, frame = camera.read()
-        # Check Reading the Camera successfully
         if not loaded:
             print("Failed to read from the camera")
+            continue
 
-        # Run the Model
         detection = model(frame)
 
-        # Check if game is still on
-        if points < 0:
-            game_lost()
-
-        # Check for the palm gesture with highest confidence
+        # Check for Steering 
         palm = Steer.get_palm(detection[0])
-
-        # If Palm was detected
         if palm is not None:
-            # Get the coordinates of the Bounding box
             x1, y1, x2, y2 = palm
-            # Calculate the center of the box
-            x_center = float( float(x1) + float(x2) ) / 2
-            # Get the current lane
+            x_center = (float(x1) + float(x2)) / 2
             mcqueen.update_lane(x_center)
-            
-            
 
-        # Check if Nitro is Working   
-        string, isNitro = useNitro.response()
+        # --- Boost gesture ---
+        if useNitro.get_peace(detection[0]) is not None:
+            useNitro.after_detection()
 
-        if not isNitro:
-            
-            for item in items:
-                item.step()
-                if item.active == False:
-                    item = new_item(NUM_ITEMS, NUM_LANES)
-                if item.collided(mcqueen.current_lane, mcqueen.y, mcqueen.is_boosting):
-                    item.collision_action(points, penalty=PENALTY, reward=REWARD)
-            if detection == "peace_sign":
-                useNitro.after_detection()
+        useNitro.response()  # ends the boost window once time is up
+        mcqueen.is_boosting = useNitro.boost
 
+        # 
+        for i, item in enumerate(items):
+            item.step()
 
-        # Show the frame
+            if item.collided(mcqueen.current_lane, mcqueen.y, useNitro.vulnerable):
+                if isinstance(item, ob.Tire):
+                    points = item.collision_action(points, PENALTY)
+                else:
+                    points = item.collision_action(points, REWARD)
+                    useNitro.nitro_add()
+
+            if not item.active:
+                items[i] = new_item(NUM_LANES)
+            else:
+                item.show(frame)
+
+        # Draw track and car
         frame = lanes.draw_track(frame, NUM_LANES)
         frame = mcqueen.draw(frame)
-        
+
         cv.putText(frame, f"Lane: {mcqueen.current_lane}", (10, 30),
-            cv.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
-        
+                   cv.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+        cv.putText(frame, f"Score: {points}", (10, 60),
+                   cv.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+        cv.putText(frame, f"Nitro: {useNitro.nitro}", (10, 90),
+                   cv.FONT_HERSHEY_SIMPLEX, 0.8, (0, 215, 255), 2)
+
         cv.imshow("mcqueen Run", frame)
+
+        if points < 0:
+            game_lost(frame)
+            return
+
         key = cv.waitKey(1) & 0xFF
         if key == ord('q'):
-            break
-        
+            camera.release()
+            cv.destroyAllWindows()
+            return
 
 
 if __name__ == "__main__":

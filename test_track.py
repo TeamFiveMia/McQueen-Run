@@ -8,13 +8,16 @@ Controls:
 import cv2
 import numpy as np
 
-from lanes import FRAME_WIDTH, FRAME_HEIGHT, NUM_LANES, draw_track
+from lanes import draw_track
 from McQueen import McQueen
 
+NUM_LANES = 5
+FRAME_WIDTH = 640
+FRAME_HEIGHT = 480
 
-# def _mouse_callback(event, x, y, flags, param):
-#     """Uses the mouse as a stand-in for the hand gesture x-position."""
-#     param["mouse_x"] = x
+def _mouse_callback(event, x, y, flags, param):
+    """Uses the mouse as a stand-in for the hand gesture x-position."""
+    param["mouse_x"] = x
 
 
 def main():
@@ -23,8 +26,8 @@ def main():
 
     window_name = "Track Layout Test - Rewan's Part"
     cv2.namedWindow(window_name)
-    # mouse_state = {"mouse_x": FRAME_WIDTH // 2}
-    # cv2.setMouseCallback(window_name, _mouse_callback, mouse_state)
+    mouse_state = {"mouse_x": FRAME_WIDTH // 2}
+    cv2.setMouseCallback(window_name, _mouse_callback, mouse_state)
 
     print("Move your MOUSE left/right over the window to simulate the hand's x-position.")
     print("Press 'b' to toggle boost visual. Press 'q' to quit.")
