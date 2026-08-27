@@ -111,6 +111,12 @@ with vision.HandLandmarker.create_from_options(options) as finder:
 
                 #for YOLO format
                 #class_id center_x center_y width height
+                padding = 0.30  # 30% padding
+
+                x_min = max(0, x_min - padding * (x_max - x_min))
+                x_max = min(1, x_max + padding * (x_max - x_min))
+                y_min = max(0, y_min - padding * (y_max - y_min))
+                y_max = min(1, y_max + padding * (y_max - y_min))
                 box_w = x_max - x_min
                 box_h = y_max - y_min
                 x_center = x_min + (box_w / 2)
