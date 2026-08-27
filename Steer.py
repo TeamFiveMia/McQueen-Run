@@ -15,9 +15,9 @@ def calc_position(lane, lane_width):
 def get_lane(x_center, lane_width, no_lanes):
 
     # Return the index of the lane
-    lane = int((x_center / lane_width))
+    lane = int((x_center / lane_width) + 1)
     # Ensure that lane is not greater than last valid lane
-    lane = min(lane, no_lanes - 1)
+    lane = min(lane, no_lanes)
 
     return lane  
 
@@ -40,19 +40,3 @@ def get_palm(result):
             priority = (x1, y1, x2, y2)
 
     return priority
-
-
-while True:
-    palm_box = get_palm(result)
-
-    if palm_box is not None:
-
-
-        # Calculate the x coordinate for the center of the box
-        x_center = (x1 + x2) / 2
-
-        # Get the lane index
-        lane = get_lane(x_center, Lane_width, lanes)
-
-        # Calculate the car position
-        car_position = calc_position(lane, Lane_width)

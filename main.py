@@ -22,6 +22,7 @@ bottom_pos = 0 # Position at the bottom of the screen
 number = 10 # Number of items at any time
 lanes = 5 # Number of lanes ( MODIFIED )
 items = [] # The list of all items
+LANE_WIDTH = FRAME_WIDTH / lanes
 
 points = 0 # Initializing points to 0
 PENALTY = 10 # The penalty of points when colliding with the tires
@@ -74,6 +75,18 @@ def main():
 
         # Check for the palm gesture with highest confidence
         palm = Steer.get_palm(detection)
+
+        # If Palm was detected
+        if palm is not None:
+            # Get the coordinates of the Bounding box
+            x1, y1, x2, y2 = palm
+            # Calculate the center of the box
+            x_center = (x1 + x2) / 2
+            # Get the current lane
+            mcqueen.lane = Steer.get_lane(x_center, LANE_WIDTH, lanes)
+            
+        # Calculate the current X position
+        mcqueen.pos = Steer.calc_position(mcqueen.lane, LANE_WIDTH)
         # Check if Nitro is Working   
         string, isNitro = useNitro.response()
         if not isNitro:
