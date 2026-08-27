@@ -56,6 +56,8 @@ def game_lost():
 
 
 def main():
+
+    mcqueen = McQueen(NUM_LANES, FRAME_WIDTH, FRAME_HEIGHT)
     # Create the items
     for _ in range(10):
         items.append(new_item(NUM_ITEMS, lanes))
@@ -85,7 +87,7 @@ def main():
             # Calculate the center of the box
             x_center = (x1 + x2) / 2
             # Get the current lane
-            McQueen.update_lane(x_center, LANE_WIDTH, lanes)
+            mcqueen.update_lane(x_center, LANE_WIDTH, lanes)
             
             
         # Calculate the current X position

@@ -4,9 +4,11 @@ vulnerable  = False
 boost = False
 boost_time = 2
 endTime = 0
+
 def nitro_add():
     global nitro
     nitro += 1
+
 def after_detection():
     global nitro,vulnerable,boost,boost_time
     if nitro > 0 and not boost:

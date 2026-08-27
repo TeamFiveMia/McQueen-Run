@@ -17,12 +17,12 @@ How to use this module (for the rest of the team):
 import cv2
 import numpy as np
 
-from lanes import FRAME_WIDTH, FRAME_HEIGHT, NUM_LANES, get_lane_index, get_lane_center_x
+from lanes import get_lane_index, get_lane_center_x
 
 
 class McQueen:
-    def __init__(self, num_lanes=NUM_LANES, frame_width=FRAME_WIDTH,
-                 frame_height=FRAME_HEIGHT, smooth=True):
+    def __init__(self, num_lanes, frame_width,
+                 frame_height, smooth=True):
         self.num_lanes = num_lanes
         self.frame_width = frame_width
         self.frame_height = frame_height

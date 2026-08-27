@@ -3,23 +3,23 @@
 PALM_CLASS = 0
 CONF_THRESHOLD = 0.6
 
-# Get the Car position in Pixels
-def calc_position(lane, lane_width):
+# # Get the Car position in Pixels
+# def calc_position(lane, lane_width):
 
-    # Calculate the Car Position (neglect decimals)
-    position = int(lane_width * lane + lane_width / 2)
+#     # Calculate the Car Position (neglect decimals)
+#     position = int(lane_width * lane + lane_width / 2)
 
-    return position
+#     return position
 
 
-def get_lane(x_center, lane_width, no_lanes):
+# def get_lane(x_center, lane_width, no_lanes):
 
-    # Return the index of the lane
-    lane = int((x_center / lane_width) + 1)
-    # Ensure that lane is not greater than last valid lane
-    lane = min(lane, no_lanes)
+#     # Return the index of the lane
+#     lane = int((x_center / lane_width) + 1)
+#     # Ensure that lane is not greater than last valid lane
+#     lane = min(lane, no_lanes)
 
-    return lane  
+#     return lane  
 
 def get_palm(result):
 
