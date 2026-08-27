@@ -21,7 +21,7 @@ from lanes import FRAME_WIDTH, FRAME_HEIGHT, NUM_LANES, get_lane_index, get_lane
 
 
 class McQueen:
-    def init(self, num_lanes=NUM_LANES, frame_width=FRAME_WIDTH,
+    def __init__(self, num_lanes=NUM_LANES, frame_width=FRAME_WIDTH,
                  frame_height=FRAME_HEIGHT, smooth=True):
         self.num_lanes = num_lanes
         self.frame_width = frame_width
@@ -38,7 +38,7 @@ class McQueen:
         self.display_x = float(get_lane_center_x(self.current_lane, frame_width, num_lanes))
         self.smooth_speed = 0.35  
 
-        self.is_boosting = False  
+        self.is_boosting = False   # turned on/off by the nitro/boost module
 
     def update_lane(self, hand_x_pixels: float):
         """Update which lane McQueen should be in, based on the hand's x-position."""
@@ -91,8 +91,6 @@ class McQueen:
                     frame,
                     (x_center - self.car_width // 2 + i * 3, trail_y),
                     (x_center + self.car_width // 2 - i * 3, trail_y + 6),
-                    (0, 215, 255),
-                    -1
-                )
+                    (0, 215, 255),-1  )
 
         return frame
