@@ -51,12 +51,7 @@ def main():
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
             break
-        elif key == ord('b'):
-            # keeps the state change in one place
-            if mcqueen.is_boosting:
-                mcqueen.end_boost()
-            else:
-                mcqueen.start_boost()
+        
 
     cap.release()
     cv2.destroyAllWindows()

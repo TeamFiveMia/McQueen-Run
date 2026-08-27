@@ -1,4 +1,6 @@
 import random as rand
+import McQueen
+import lanes
 import obstacles as ob
 import numpy as np      # Importing numpy
 import cv2 as cv        # Import open cv library
@@ -19,8 +21,8 @@ speed = 5 # The speed at which items move
 top_pos = FRAME_HEIGHT # Position at the top of the screen
 bottom_pos = 0 # Position at the bottom of the screen
 
-number = 10 # Number of items at any time
-lanes = 5 # Number of lanes ( MODIFIED )
+NUM_ITEMS = 10 # Number of items at any time
+NUM_LANES = 5 # Number of lanes ( MODIFIED )
 items = [] # The list of all items
 LANE_WIDTH = FRAME_WIDTH / lanes
 
@@ -29,9 +31,9 @@ PENALTY = 10 # The penalty of points when colliding with the tires
 REWARD = 5 # The reward points when collecting with nitro
 
 # Get McQueen's data, from Rewan's code
-mcqueen.pos = ...       
-mcqueen.lane = lanes // 2      # (MODIFIABLE) start at the Middle
-mcqueen.vulnerable = ...
+McQueen.pos = ...       
+McQueen.lane = lanes // 2      # (MODIFIABLE) start at the Middle
+McQueen.vulnerable = ...
 
 # new_item: Returns a list of random items in random lanes
 def new_item(number, lanes):
@@ -56,7 +58,7 @@ def game_lost():
 def main():
     # Create the items
     for _ in range(10):
-        items.append(new_item(number, lanes))
+        items.append(new_item(NUM_ITEMS, lanes))
 
     # Start the game
     while True:
@@ -83,26 +85,40 @@ def main():
             # Calculate the center of the box
             x_center = (x1 + x2) / 2
             # Get the current lane
-            mcqueen.lane = Steer.get_lane(x_center, LANE_WIDTH, lanes)
+            McQueen.update_lane(x_center, LANE_WIDTH, lanes)
+            
             
         # Calculate the current X position
-        mcqueen.pos = Steer.calc_position(mcqueen.lane, LANE_WIDTH)
+        McQueen.pos = Steer.calc_position(McQueen.lane, LANE_WIDTH)
+
         # Check if Nitro is Working   
         string, isNitro = useNitro.response()
+
         if not isNitro:
             
             for item in items:
                 item.step()
                 if item.active == False:
-                    item = new_item(number, lanes)
-                if item.collided(item, mcqueen.lane, mcqueen.pos, mcqueen.vulnerable):
+                    item = new_item(NUM_ITEMS, lanes)
+                if item.collided(item, McQueen.lane, McQueen.pos, McQueen.vulnerable):
                     item.collision_action(points, penalty=PENALTY, reward=REWARD)
             if detection == "peace_sign":
                 useNitro.after_detection()
 
 
-        # Draw the Frame
-        ## TODO >> Rewan's part
+        
+
+        # Show the frame
+        frame = lanes.draw_track(frame, NUM_LANES)
+        frame = McQueen.draw(frame)
+        
+        cv.putText(frame, f"Lane: {McQueen.current_lane}", (10, 30),
+            cv.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+        
+        cv.imshow("McQueen Run", frame)
+        key = cv.waitKey(1) & 0xFF
+        if key == ord('q'):
+            break
         
 
 
