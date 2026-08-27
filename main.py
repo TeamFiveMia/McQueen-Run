@@ -6,7 +6,7 @@ top_pos = 200 # Position at the top of the screen
 bottom_pos = 0 # Position at the bottom of the screen
 
 number = 10 # Number of items at any time
-lanes = 4 # Number of lanes
+lanes = 5 # Number of lanes
 items = [] # The list of all items
 
 points = 0 # Initializing points to 0
@@ -22,7 +22,7 @@ mcqueen.vulnerable = ...
 def new_item(number, lanes):
     for _ in range(number):
         type = rand.randint(1,2)
-        lane = rand.randint(1, lanes)
+        lane = rand.randint(0, lanes)
 
         if type == 1:
             return ob.Tire(lane, speed, top_pos, bottom_pos)
