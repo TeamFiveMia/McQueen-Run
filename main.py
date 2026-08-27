@@ -29,8 +29,8 @@ PENALTY = 10 # The penalty of points when colliding with the tires
 REWARD = 5 # The reward points when collecting with nitro
 
 # Get McQueen's data, from Rewan's code
-mcqueen.pos = ...
-mcqueen.lane = ...
+mcqueen.pos = ...       
+mcqueen.lane = lanes // 2      # (MODIFIABLE) start at the Middle
 mcqueen.vulnerable = ...
 
 # new_item: Returns a list of random items in random lanes
@@ -99,6 +99,10 @@ def main():
                     item.collision_action(points, penalty=PENALTY, reward=REWARD)
             if detection == "peace_sign":
                 useNitro.after_detection()
+
+
+        # Draw the Frame
+        ## TODO >> Rewan's part
         
 
 

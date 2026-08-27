@@ -3,7 +3,7 @@ nitro = 0
 vulnerable  = False
 boost = False
 boost_time = 2
-currentTime = 0
+endTime = 0
 def nitro_add():
     global nitro
     nitro += 1
