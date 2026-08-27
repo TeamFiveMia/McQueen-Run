@@ -1,0 +1,12 @@
+# Path configuration (Relative to where you run the script, or absolute paths)
+path: C:/Users/a/Desktop/Coding/M.I.A/McQueen-Run/yolo model/data
+train: train1/images   # Relative to 'path'
+val: validation2/images # Relative to 'path'
+
+# Number of classes
+nc: 2
+
+# Class names (Index 0 = palm, Index 1 = peace)
+names:
+  0: palm
+  1: peace

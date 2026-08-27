@@ -6,7 +6,7 @@ from pathlib import Path
 cwd = Path.cwd()
 print(cwd)
 
-video_path = "yolo model\\data\\video1.mp4"
+video_path = "yolo model\\data\\mahmoud.mov"
 # C:\Users\a\Desktop\Coding\M.I.A\McQueen-Run\yolo model\data\video1.mp4
 capture = cv2.VideoCapture(video_path)
 
@@ -32,7 +32,7 @@ while return_bool:
         break
 
     
-    frame_filename = os.path.join(output_dir, f"frame_{frame_count:05d}.jpg")
+    frame_filename = os.path.join(output_dir, f"mahmoud_frame_{frame_count:05d}.jpg")
 
     
     cv2.imwrite(frame_filename, frame)

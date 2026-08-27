@@ -23,7 +23,7 @@ options = vision.HandLandmarkerOptions(
     min_hand_detection_confidence=0.7
 )
 
-input_dir = "data\\train"
+input_dir = "extracted_frames"
 
 # os.makedirs(output, exist_ok=True)
 #test_pic = "extracted_frames\\frame_00001.jpg"
@@ -123,7 +123,7 @@ with vision.HandLandmarker.create_from_options(options) as finder:
                     y_center = y_min + (box_h / 2)
 
                     txt_path = os.path.join(
-                                            input,
+                                            input_dir,
                                             os.path.splitext(filename)[0] + ".txt"
                     )
                     with open(txt_path, "w") as f:
@@ -136,7 +136,7 @@ with vision.HandLandmarker.create_from_options(options) as finder:
         else:
             failed_pics.append(filename)
 
-print(failed_pics)
+
 with open("failed_pics.txt", "w") as f:
     for pic in failed_pics:
         f.write(f"{pic}\n")
