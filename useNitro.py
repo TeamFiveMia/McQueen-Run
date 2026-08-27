@@ -1,6 +1,6 @@
 import time
 nitro = 0
-valnerable  = False
+vulnerable  = False
 boost = False
 boost_time = 2
 currentTime = 0
@@ -8,17 +8,17 @@ def nitro_add():
     global nitro
     nitro+=1
 def after_detection():
-    global nitro,valnerable,boost,boost_time
+    global nitro,vulnerable,boost,boost_time
     if nitro > 0 and not boost:
         nitro -=1
-        valnerable = False
+        vulnerable = False
         boost = True
         endTime = time.time() + boost_time
 def response():
-    global valnerable,boost
+    global vulnerable,boost
     if boost and time.time()>= endTime:
         boost = False
-        valnerable = True
+        vulnerable = True
         return "Nitro Done",True
     return "Nitro not Done",False
         
