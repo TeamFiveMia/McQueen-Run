@@ -26,7 +26,7 @@ options = vision.HandLandmarkerOptions(
 input_dir = "data\\data\\train"
 output = "data\\labels"
 os.makedirs(output, exist_ok=True)
-test_pic = "extracted_frames\\frame_00001.jpg"
+#test_pic = "extracted_frames\\frame_00001.jpg"
 
 
 
@@ -54,17 +54,21 @@ test_pic = "extracted_frames\\frame_00001.jpg"
 
 
 with vision.HandLandmarker.create_from_options(options) as finder:
-    img = cv.imread(test_pic)
-    img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+     for filename in os.listdir(input_dir):
+        if not filename.lower().endswith((".jpg", ".jpeg", ".png")):
+            continue
 
-    mp_img = mp.Image(mp.ImageFormat.SRGB, img)
+        img_path = os.path.join(input_dir, filename)
+        img = cv.imread(img_path)
+        img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+        mp_img = mp.Image(mp.ImageFormat.SRGB, img)
 
 
-    result = finder.detect(mp_img)
-    print("hi2")
-    if result.hand_landmarks:
-        print("hi")
-        for lm in result.hand_landmarks:
+        result = finder.detect(mp_img)
+        print("hi2")
+        if result.hand_landmarks:
+          print("hi")
+          for lm in result.hand_landmarks:
             print(lm)
             thumb_up = False
             index_up = False
@@ -112,7 +116,10 @@ with vision.HandLandmarker.create_from_options(options) as finder:
                 x_center = x_min + (box_w / 2)
                 y_center = y_min + (box_h / 2)
 
-                txt_path = "extracted_frames\\frame_00001.txt"
+                txt_path = os.path.join(
+                                        output,
+                                        os.path.splitext(filename)[0] + ".txt"
+                )
                 with open(txt_path, "w") as f:
                     f.write(f"{hand} {x_center:.6f} {y_center:.6f} {box_w:.6f} {box_h:.6f}\n")
 
