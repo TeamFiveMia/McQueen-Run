@@ -3,7 +3,7 @@ import obstacles as ob
 import numpy as np      # Importing numpy
 import cv2 as cv        # Import open cv library
 import useNitro         # Import Module that contains Nitro boost feature
-import steering         # Import Module that contains palm steering feature
+import Steer         # Import Module that contains palm steering feature
 from ultralytics import YOLO # Import the YOLO models (YOU ONLY LOOK ONCE)
 
 # Start the Web Cam
@@ -63,7 +63,7 @@ def main():
         loaded, frame = camera.read()
         # Check Reading the Camera successfully
         if not loaded:
-            print("Failed to ")
+            print("Failed to read from the camera")
 
         # Run the Model
         detection = model(frame)
@@ -72,9 +72,8 @@ def main():
         if points < 0:
             game_lost()
 
-            # Check for the palm gesture
-
-        palm
+        # Check for the palm gesture with highest confidence
+        palm = Steer.get_palm(detection)
         # Check if Nitro is Working   
         string, isNitro = useNitro.response()
         if not isNitro:

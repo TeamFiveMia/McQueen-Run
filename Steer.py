@@ -1,5 +1,8 @@
 # Palm gesture Steering 
 
+PALM_CLASS = 0
+CONF_THRESHOLD = 0.6
+
 # Get the Car position in Pixels
 def calc_position(lane, lane_width):
 
@@ -18,7 +21,7 @@ def get_lane(x_center, lane_width, no_lanes):
 
     return lane  
 
-def get_palm(result, conf_threshold):
+def get_palm(result):
 
     priority = None
     highest_conf = 0.0
@@ -27,7 +30,7 @@ def get_palm(result, conf_threshold):
         class_id = int(box.cls[0])
         confidence = float(box.conf[0])
 
-        if class_id == 0 and confidence > conf_threshold:
+        if class_id == PALM_CLASS and confidence > CONF_THRESHOLD:
 
             if confidence > highest_conf:
                 highest_conf = confidence

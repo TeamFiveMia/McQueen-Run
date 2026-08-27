@@ -1,6 +1,6 @@
 import random as rand
-
 import useNitro
+
 # Define a class "Item" which is any item that appears in the game
 class Item:
     def __init__(self, lane, speed, top_pos, bottom_pos):
