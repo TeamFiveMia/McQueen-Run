@@ -18,7 +18,7 @@ model = YOLO("best.pt")
 
 SPEED = 5      # Speed of objects falling
 TOP_POS = 0    # Coordinates start y = 0 from up
-BOTTOM_POS = FRAME_HEIGHT
+BOTTOM_POS = FRAME_HEIGHT   # Bottom of the screen is the y-axis
 
 NUM_ITEMS = 10   # Number of obstacles
 NUM_LANES = 5    # Number of lanes (fixed :( )
@@ -26,7 +26,7 @@ NUM_LANES = 5    # Number of lanes (fixed :( )
 PENALTY = 10
 REWARD = 5
 
-points = 0     # Score
+points = 0     # Score on start
 
 
 def new_item(no_lanes):
@@ -73,11 +73,13 @@ def main():
             x_center = (float(x1) + float(x2)) / 2
             mcqueen.update_lane(x_center)
 
-        # --- Boost gesture ---
-        if useNitro.get_peace(detection[0]) is not None:
+        # Check for Boost
+        peace = useNitro.get_peace(detection[0])
+        if peace is not None:
             useNitro.after_detection()
 
-        useNitro.response()  # ends the boost window once time is up
+        # Ends boost when time is over
+        useNitro.response() 
         mcqueen.is_boosting = useNitro.boost
 
         # 
