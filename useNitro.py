@@ -1,7 +1,7 @@
 import time
 
 PEACE_CLASS = 1
-CONF_THRESHOLD = 0.6
+CONF_THRESHOLD = 0.7
 
 nitro = 0
 vulnerable = True     

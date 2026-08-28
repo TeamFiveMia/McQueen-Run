@@ -1,6 +1,6 @@
 # Palm Steering
 PALM_CLASS = 0
-CONF_THRESHOLD = 0.6
+CONF_THRESHOLD = 0.7
 
 
 def get_palm(result):

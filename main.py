@@ -101,6 +101,7 @@ def main():
         # Draw track and car
         frame = lanes.draw_track(frame, NUM_LANES)
         frame = mcqueen.draw(frame)
+        frame = cv.flip(frame, 1)
 
         cv.putText(frame, f"Lane: {mcqueen.current_lane}", (10, 30),
                    cv.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
